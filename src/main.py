@@ -20,6 +20,8 @@ if EXEC_PATH != MAIN_PATH:
     # Altera diretório de execução para o diretório do arquivo main
     os.chdir(MAIN_PATH)
 
+OUTPUT_PATH_VIDEOS = path.join(MAIN_PATH, 'media', 'output_media')
+
 SRC_PATH_RAW_VIDEOS = path.join(MAIN_PATH, 'media', 'raw_videos')
 SRC_PATH_RAW_VIDEOS2 = path.join(MAIN_PATH, 'media', 'raw_videos2')
 
@@ -47,15 +49,15 @@ def get_video_cap_info(cap):
     qtd_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
     fps =  cap.get(cv2.CAP_PROP_FPS)
     tempo = round(qtd_frames / fps, 3)
-    width = cap.get(3)
-    height = cap.get(4)
+    width = int(cap.get(3))
+    height = int(cap.get(4))
 
     msg = f"""{G} ------- Informações do Vídeo -------
 
 {Y} FPS: {G}{fps}
 {Y} Qtd. Frames: {G}{qtd_frames}
 {Y} Tempo: {G}{tempo} s
-{Y} Dimensões {G} ({height}X{width}) px
+{Y} Dimensões {G} ({width} X {height}) px
 ----------------------------------{W}"""
     print(msg)
 
@@ -63,7 +65,7 @@ def get_video_cap_info(cap):
         'fps': fps,
         'frames': qtd_frames,
         'tempo': tempo,
-        'dimensoes': (height, width)
+        'dimensoes': (width, height)
     }
     return infos
 
@@ -258,7 +260,8 @@ def process_video(compare=False, resize=1.0):
     else:
         print(f'{C}Processando o vídeo "{video_path}"{W}')
 
-        pre_process = escolher_pre_processamento()
+        # pre_process = escolher_pre_processamento()
+        pre_process = ''
         resize = 1
 
         # Capturando o vídeo
@@ -298,6 +301,16 @@ def process_video(compare=False, resize=1.0):
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         ponto_circulo = get_max_point() or (0, 0, 0)
+
+        save_name = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') + '.avi'
+        writer = cv2.VideoWriter(
+            path.join(OUTPUT_PATH_VIDEOS, save_name),
+            cv2.VideoWriter_fourcc(*'MJPG'),
+            video_infos['fps'],
+            video_infos['dimensoes'],
+            0
+        )
+        #writer = cv2.VideoWriter('teste.avi', -1, video_infos['fps'], video_infos['dimensoes'], 0)
 
         while True:
             has_frame, frame = cap.read()
@@ -365,11 +378,16 @@ def process_video(compare=False, resize=1.0):
             cv2.putText(frame, fps_text, (5, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 1)
 
             cv2.imshow("Application", frame)
+            frame = cv2.resize(frame, video_infos['dimensoes'])
+            writer.write(frame)
+
             key = cv2.waitKey(1)
             if key == ord('q'):
                 break
 
         cap.release()
+        writer.release()
+
         cv2.destroyAllWindows()
 
 def process_local_video(video_path):
