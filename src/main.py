@@ -366,18 +366,18 @@ def process_video(compare=False, resize=1.0):
                 else:
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-            # fps_end_time = datetime.datetime.now()
-            # time_diff = fps_end_time - fps_start_time
-            # if time_diff.seconds == 0:
-            #     fps = 0.0
-            # else:
-            #     fps = (total_frames / time_diff.seconds)
+            fps_end_time = datetime.datetime.now()
+            time_diff = fps_end_time - fps_start_time
+            if time_diff.seconds == 0:
+                fps = 0.0
+            else:
+                fps = (total_frames / time_diff.seconds)
 
-            # fps_text = "FPS: {:.2f}".format(fps)
+            fps_text = "FPS: {:.2f}".format(fps)
 
-            # cv2.putText(frame, fps_text, (5, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 1)
+            cv2.putText(frame, fps_text, (5, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 1)
 
-            # cv2.imshow("Application", frame)
+            cv2.imshow("Application", frame)
             frame = cv2.resize(frame, video_infos['dimensoes'])
             writer.write(frame)
 
