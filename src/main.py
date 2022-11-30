@@ -302,8 +302,9 @@ def process_video(compare=False, resize=1.0):
 
         ponto_circulo = get_max_point() or (0, 0, 0)
 
+        save_name = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') + '.avi'
         writer = cv2.VideoWriter(
-            path.join(OUTPUT_PATH_VIDEOS, 'teste.avi'),
+            path.join(OUTPUT_PATH_VIDEOS, save_name),
             cv2.VideoWriter_fourcc(*'MJPG'),
             video_infos['fps'],
             video_infos['dimensoes'],
