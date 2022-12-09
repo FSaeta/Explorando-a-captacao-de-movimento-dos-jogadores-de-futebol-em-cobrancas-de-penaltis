@@ -7,7 +7,7 @@ import math
 import os
 import os.path as path
 
-from menu_utils import R, Y, W, C, G
+from menu_utils import R, Y, B, C, G
 import menu_utils as F_SYS
 import menu
 
@@ -58,7 +58,7 @@ def get_video_cap_info(cap):
 {Y} Qtd. Frames: {G}{qtd_frames}
 {Y} Tempo: {G}{tempo} s
 {Y} Dimensões {G} ({width} X {height}) px
-----------------------------------{W}"""
+----------------------------------{B}"""
     print(msg)
 
     infos = {
@@ -172,19 +172,19 @@ def get_BGS_subtractor(bgs_type, shadows=True):
                                                         maxPixelStability=15*60,
                                                         isParallel=True)
 
-    print(f'{R}Não foi encontrada nenhuma optmização com o nome "{bgs_type}"{W}')
+    print(f'{R}Não foi encontrada nenhuma optmização com o nome "{bgs_type}"{B}')
     return False
 
 def escolher_pre_processamento():
     print("Escolha um algoritmo de pré processamento, ou pressione enter para continuar \n"
-         f"sem pré processamento. Algoritmos disponíveis: \n {Y} {BGS_TYPES} {W}")
+         f"sem pré processamento. Algoritmos disponíveis: \n {Y} {BGS_TYPES} {B}")
     while True:
-        pre_process = input(f'{G}Digite o nome do algoritmo de pré processamento: {W}')
+        pre_process = input(f'{G}Digite o nome do algoritmo de pré processamento: {B}')
         if pre_process:
             if pre_process in BGS_TYPES:
-                print(f'{C}Continuando com o algoritmo {pre_process} ... {W}')
+                print(f'{C}Continuando com o algoritmo {pre_process} ... {B}')
                 return pre_process
-            print(f'{R}Algoritmo de nome "{pre_process}" inválido !{W}')
+            print(f'{R}Algoritmo de nome "{pre_process}" inválido !{B}')
         else:
             return pre_process
 
@@ -256,9 +256,9 @@ def process_video(compare=False, resize=1.0):
     global W
     video_path = F_SYS.pedir_nome_video()
     if not video_path:
-        print(f"{C} Não foi possível encontrar o vídeo, voltando para o Menu ...{W}")
+        print(f"{C} Não foi possível encontrar o vídeo, voltando para o Menu ...{B}")
     else:
-        print(f'{C}Processando o vídeo "{video_path}"{W}')
+        print(f'{C}Processando o vídeo "{video_path}"{B}')
 
         # pre_process = escolher_pre_processamento()
         pre_process = ''
@@ -280,15 +280,21 @@ def process_video(compare=False, resize=1.0):
             has_frame, frame = cap.read()
 
             if not has_frame:
-                print(f"{C}Terminando de processar o vídeo ...{W}")
+                print(f"{C}Terminando de processar o vídeo ...{B}")
                 break
 
             if pre_process:
                 frame = pre_process_video(frame, subtractor=pre_process, resize=resize, background=backgroundFrame)
 
+            # Para identificar a bola, utilizamos a técnica de blur na imagem para
+            # melhorar a detecção de círculos, reduzindo a quantidade de círculos
+            # falso positivos encontrados
+
             grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             blurFrame = cv2.GaussianBlur(grayFrame, (11,11), 0)
 
+            # Com a imagem com o blur aplicado, o método HoughCircles do OpenCV é utilizado
+            # para encontrar círculos na imagem
             circles = cv2.HoughCircles(blurFrame, cv2.HOUGH_GRADIENT, 1.2, 1000000,
                               param1=31, param2=21, minRadius=8, maxRadius=12)
             
@@ -316,7 +322,7 @@ def process_video(compare=False, resize=1.0):
             has_frame, frame = cap.read()
 
             if not has_frame:
-                print(f"{C}Terminando de processar o vídeo ...{W}")
+                print(f"{C}Terminando de processar o vídeo ...{B}")
                 break
 
             frame = cv2.resize(frame, (0, 0), fx=resize, fy=resize)
@@ -385,6 +391,8 @@ def process_video(compare=False, resize=1.0):
             if key == ord('q'):
                 break
 
+            # import pdb; pdb.set_trace()
+
         cap.release()
         writer.release()
 
@@ -401,13 +409,13 @@ menus.update({
         "DISPARADOR DE SINAL NO MOMENTO DO CHUTE NA BATIDA DE PÊNALTI",
         'main', 
         f"""
-{Y}[1]{W} Ler vídeo salvo localmente
+{Y}[1]{B} Ler vídeo salvo localmente
 
-{Y}[0]{W} Sair
+{Y}[0]{B} Sair
         """,
         {0: [(exit, [])],
          1: [('change_menu', [1])],
-         2: [(print, [f'{R}Método ainda não implementado !{W}'])],
+         2: [(print, [f'{R}Método ainda não implementado !{B}'])],
         'file sys': [('change_menu', ['file_sys'])],
         }
     ),
@@ -415,12 +423,12 @@ menus.update({
 file_sys_menu = menu.Menu(
         "Operações no diretório", 'file_sys',
         f"""
-{Y}[1]{W} Ver diretórios disponíveis
-{Y}[2]{W} Ver arquivos disponíveis
-{Y}[3]{W} Ver diretório
-{Y}[4]{W} Trocar de diretório
+{Y}[1]{B} Ver diretórios disponíveis
+{Y}[2]{B} Ver arquivos disponíveis
+{Y}[3]{B} Ver diretório
+{Y}[4]{B} Trocar de diretório
 
-{Y}[0]{W} Voltar
+{Y}[0]{B} Voltar
         """,
         {0: [('change_prev_menu', [])],
          1: [(F_SYS.print_dir_itens, ['dirs'])],
@@ -435,10 +443,10 @@ menus.update({
     1: menu.Menu(
         nome="SELECIONAR VÍDEO LOCALMENTE", id=1, parent_id='main',
         msg=f"""
-{Y}[1]{W} Escolher vídeos da RAW_VIDEOS
-{Y}[2]{W} Escolher vídeos da RAW_VIDEOS2
+{Y}[1]{B} Escolher vídeos da RAW_VIDEOS
+{Y}[2]{B} Escolher vídeos da RAW_VIDEOS2
 
-{Y}[0]{W} Voltar
+{Y}[0]{B} Voltar
         """,
         methods={
             1: [(process_local_video, [SRC_PATH_RAW_VIDEOS])],
@@ -460,9 +468,9 @@ if __name__ == '__main__':
     while running:
         menu_ativo = Display._get_menu_ativo()
         if not menu_ativo:
-            print(f'{R}>>> TERMINANDO O PRORAMA ! \n>>> \n>>> O menu ativo não foi obtido{W}')
+            print(f'{R}>>> TERMINANDO O PRORAMA ! \n>>> \n>>> O menu ativo não foi obtido{B}')
             running = False
             break
         print("\n==================================")
-        print(f"{C}{os.getcwd()}{W}")
+        print(f"{C}{os.getcwd()}{B}")
         Display.exec_menu()

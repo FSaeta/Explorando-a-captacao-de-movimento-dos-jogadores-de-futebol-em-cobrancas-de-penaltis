@@ -2,7 +2,7 @@ R = '\033[31m' # vermelho
 G = '\033[01;32m' # verde
 Y = '\033[01;33m' # amarelo
 C = '\033[36m' # ciano
-W = '\033[0m'  # branco
+B = '\033[0m'  # branco
 
 import os
 import os.path as path
@@ -59,9 +59,9 @@ def print_dirs(itens=[], recursive=False):
     """
     # Filtra apenas os itens que são diretórios
     dirs = filter(lambda item: item.is_dir(), itens or get_directory_itens('.', recursive, False))
-    print(f"{C} ---  DIRETÓRIOS  ---{W}")
+    print(f"{C} ---  DIRETÓRIOS  ---{B}")
     for d in dirs:
-        print(f"{G}-> {Y}{d.name}{W}")
+        print(f"{G}-> {Y}{d.name}{B}")
     print()
 
 def print_files(itens=[]):
@@ -71,10 +71,10 @@ def print_files(itens=[]):
         itens = os.scandir()
     # Filtra apenas os itens que são arquivos e os ordena pelo tamanho
     files = sorted(filter(lambda item: item.is_file(), itens), key=lambda f: path.getsize(f.path))
-    print(f"{C} ---  ARQUIVOS  ---{W}")
+    print(f"{C} ---  ARQUIVOS  ---{B}")
     for f in files:
         if path.exists(f.path):
-            print(f"{Y}-> {f.name}   |   {G}{path.getsize(f.path) / 1024} kB{W}")
+            print(f"{Y}-> {f.name}   |   {G}{path.getsize(f.path) / 1024} kB{B}")
     print(" -------------------------------------- ")
 
 def print_dir_itens(opt='all', pth='.', recursive=False):
@@ -98,11 +98,11 @@ def print_dir_itens(opt='all', pth='.', recursive=False):
 def validate_dir_change(pth):
     exists = path.exists(pth)
     if not exists:
-        print(f'{R}Não foi possível encontrar o caminho "{W}{pth}{R}"{W}')
+        print(f'{R}Não foi possível encontrar o caminho "{B}{pth}{R}"{B}')
     return exists
 
 def change_dir_action():
-    print(f"{G}Escolha um diretório a seguir para acessar:{W}")
+    print(f"{G}Escolha um diretório a seguir para acessar:{B}")
     print_dir_itens('dirs')
     try:
         ask = True
@@ -111,7 +111,7 @@ def change_dir_action():
             valid = validate_dir_change(dir_name)
             if valid:
                 os.chdir(dir_name)
-                print(f'{Y}O diretório foi alterado para: {C}{os.getcwd()}{W}\n')
+                print(f'{Y}O diretório foi alterado para: {C}{os.getcwd()}{B}\n')
                 ask = False
     # Pressione CTRL+C para voltar ao menu 
     except KeyboardInterrupt:
@@ -120,17 +120,17 @@ def change_dir_action():
 
 def pedir_nome_video():
     print_dir_itens('files')
-    print(f'{G}Escolha um dos arquivos acima para realizar a leitura do vídeo{W}')
+    print(f'{G}Escolha um dos arquivos acima para realizar a leitura do vídeo{B}')
     valid = False
     nome = ''
     while not valid:
         try:
             nome = input(f'{G}>> ')
-            print(f'{W}', end='')
+            print(f'{B}', end='')
             valid = path.exists(nome)
             if not valid:
-                print(f'{Y}Não foi possível encontrar o vídeo com o nome "{C}{nome}{Y}"{W}')
-                print(f'{G}Digite novamente ou CTRL+C para voltar ao menu anterior{W}', end='\n\n')
+                print(f'{Y}Não foi possível encontrar o vídeo com o nome "{C}{nome}{Y}"{B}')
+                print(f'{G}Digite novamente ou CTRL+C para voltar ao menu anterior{B}', end='\n\n')
         except KeyboardInterrupt:
             return False
     return path.abspath(path.join('.', nome))

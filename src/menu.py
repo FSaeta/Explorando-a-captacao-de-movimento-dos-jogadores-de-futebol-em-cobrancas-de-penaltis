@@ -1,4 +1,4 @@
-from menu_utils import R, G, W, C, Y
+from menu_utils import R, G, B, C, Y
 import menu_utils as MUtils
 
 from os import system, name
@@ -12,7 +12,7 @@ def define_contexto(menus, id, id_pai):
     if str(id_pai) != '0':
         new_contexto = menus[id_pai].contexto['msg'] + " > " + menu.nome
         menu.contexto.update({
-            'msg': f"{G}{new_contexto}{W}",
+            'msg': f"{G}{new_contexto}{B}",
             'id_pai': id_pai
         })
 
@@ -23,7 +23,7 @@ class Menu:
         self.msg = msg
         self.methods = methods
         self.funcoes_params = self.get_funcoes_params()
-        self.contexto = {'msg': f"{G}-> {self.nome}{W}", 'id_pai': 0}
+        self.contexto = {'msg': f"{G}-> {self.nome}{B}", 'id_pai': 0}
         self.parent_id = parent_id
         self.parent_call = False
 
@@ -59,10 +59,10 @@ class Menu:
             op = input(f"Opção: {G}")
             if op.isnumeric():
                 op = int(op)
-            print(f"{W}")
+            print(f"{B}")
             if op in opcoes:
                 return op
-            print(f"{R}Opção Inválida !{W}")
+            print(f"{R}Opção Inválida !{B}")
 
 
 class MenuDisplay:
@@ -97,7 +97,7 @@ class MenuDisplay:
         if menu:
             return menu
         else:
-            print(f"{R}Nenhum menu com o id {C}'{menu_id}'{R} foi encontrado{W}")
+            print(f"{R}Nenhum menu com o id {C}'{menu_id}'{R} foi encontrado{B}")
             return False
 
     def _get_menu_ativo(self):
@@ -134,7 +134,7 @@ class MenuDisplay:
                 id_menu = menu.parent_id
             self.change_menu(id_menu)
         else:
-            print(f"{R}Nenhum menu a cima do menu {C}'{menu.nome}'{R} foi encontrado{W}")
+            print(f"{R}Nenhum menu a cima do menu {C}'{menu.nome}'{R} foi encontrado{B}")
 
     def exec_menu_funcs(self, opcao):
         """Executa todas as funções que o menu possui para a opção escolhida"""
@@ -148,7 +148,7 @@ class MenuDisplay:
                     func = getattr(self, funcao)
                     ret_f = func(*params) if params else func()
                 else:
-                    print(f"{R} FUNÇÃO '{funcao}' NÃO EXISTE !{W}")
+                    print(f"{R} FUNÇÃO '{funcao}' NÃO EXISTE !{B}")
                     ret_f = 'Erro'
                 func_name = funcao
             else:
